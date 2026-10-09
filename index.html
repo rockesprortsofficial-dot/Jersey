@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#06111f">
+<meta name="description" content="Interactive 360-degree ROCK ESPORTS jersey viewer using 16 angle images.">
+<title>ROCK ESPORTS | 360° Jersey Viewer</title>
+<style>
+*{box-sizing:border-box}body{margin:0;color:#f5fbff;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 50% 10%,#123b60 0,#071522 46%,#03070d 100%)}
+header{text-align:center;padding:22px 12px 14px}.brand{font-size:clamp(27px,5vw,42px);font-weight:950;letter-spacing:.14em}.brand span{color:#00e5ff}.subtitle{font-size:12px;letter-spacing:.18em;color:#9bb7cc;margin-top:6px}
+main{width:min(100% - 20px,920px);margin:0 auto 24px}.viewer{position:relative;min-height:65vh;display:flex;align-items:center;justify-content:center;overflow:hidden;border:1px solid #1d6586;border-radius:18px;background:linear-gradient(145deg,#0c243b,#020810);touch-action:pan-y}
+.viewer:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(120deg,transparent 0 78px,#00d9ff08 79px 81px);pointer-events:none}
+.imageWrap{z-index:1;width:min(82%,560px);display:flex;align-items:center;justify-content:center;transform-origin:center;will-change:transform;cursor:grab;user-select:none}
+#jersey{display:block;width:100%;height:auto;max-height:74vh;object-fit:contain;filter:drop-shadow(0 18px 28px #000b);user-select:none;-webkit-user-drag:none}
+.hint{position:absolute;z-index:2;bottom:10px;left:10px;right:10px;text-align:center;padding:9px 10px;border-radius:999px;background:#06111fe8;border:1px solid #24506b;color:#c8e3f4;font-size:12px}
+.controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0 10px}button{min-height:44px;padding:10px 14px;border-radius:11px;border:1px solid #1e7894;background:linear-gradient(#10344a,#081927);color:white;font-weight:750;font-size:14px;cursor:pointer}button.primary{background:linear-gradient(135deg,#00d9f5,#0085c9);border:0;color:#00101b}
+.info{text-align:center;color:#d5f7ff;font-size:14px;font-weight:700}.bar{width:min(90%,520px);margin:12px auto;display:flex;align-items:center;gap:10px}.bar input{width:100%;accent-color:#00d9f5}.note{max-width:760px;margin:14px auto;text-align:center;color:#9fb7c9;font-size:12px;line-height:1.6}footer{text-align:center;color:#64849b;font-size:11px;padding:12px 10px 24px}
+@media(min-width:700px){.viewer{min-height:700px}.imageWrap{width:min(56%,540px)}}@media(max-width:480px){.viewer{min-height:65vh;border-radius:14px}.imageWrap{width:94%}#jersey{max-height:68vh}button{font-size:13px;padding:10px 11px}.hint{font-size:11px}}
+</style>
+</head>
+<body>
+<header><div class="brand">ROCK <span>ESPORTS</span></div><div class="subtitle">INTERACTIVE 360° JERSEY VIEWER</div></header>
+<main>
+<section class="viewer" id="viewer" aria-label="360 degree jersey image viewer">
+ <div class="imageWrap" id="imageWrap"><img id="jersey" alt="ROCK ESPORTS jersey angle view"></div>
+ <div class="hint">Drag left or right to rotate • Pinch or zoom buttons to inspect details</div>
+</section>
+<div class="controls">
+ <button id="prev">↶ Previous angle</button><button id="spin" class="primary">▶ Auto rotate</button><button id="next">Next angle ↷</button>
+ <button id="zoomOut">− Zoom</button><button id="zoomIn">＋ Zoom</button><button id="reset">Reset</button>
+</div>
+<div class="info" id="info">Angle 1 of 16 • 0° Front</div>
+<div class="bar"><span>Angle</span><input id="angleSlider" type="range" min="0" max="15" step="1" value="0" aria-label="Choose jersey angle"><span>360°</span></div>
+<p class="note">Uses 16 separate jersey-angle photos. Drag to move between frames, or use Auto Rotate. This is a 16-frame photo spin, not a fully modeled 3D garment; close-up clarity depends on each source image's resolution.</p>
+</main><footer>ROCK ESPORTS • GITHUB PAGES</footer>
+<script>
+const images = ['images/ROCK_ESPORTS_01_front_0deg_4K.png','images/ROCK_ESPORTS_02_front_right_22_5deg_4K.png','images/ROCK_ESPORTS_03_right_front_45deg_4K.png','images/ROCK_ESPORTS_04_right_angle_67_5deg_4K.png','images/ROCK_ESPORTS_05_right_side_90deg_4K.png','images/ROCK_ESPORTS_06_right_back_112_5deg_4K.png','images/ROCK_ESPORTS_07_back_right_135deg_4K.png','images/ROCK_ESPORTS_08_back_right_157_5deg_4K.png','images/ROCK_ESPORTS_09_back_180deg_4K.png','images/ROCK_ESPORTS_10_back_left_202_5deg_4K.png','images/ROCK_ESPORTS_11_left_back_225deg_4K.png','images/ROCK_ESPORTS_12_left_back_247_5deg_4K.png','images/ROCK_ESPORTS_13_left_side_270deg_4K.png','images/ROCK_ESPORTS_14_left_front_292_5deg_4K.png','images/ROCK_ESPORTS_15_front_left_315deg_4K.png','images/ROCK_ESPORTS_16_front_left_337_5deg_4K.png'];
+const labels = ["0° Front","22.5° Front-Right","45° Right-Front","67.5° Right Angle","90° Right Side","112.5° Right-Back","135° Back-Right","157.5° Back-Right","180° Back","202.5° Back-Left","225° Left-Back","247.5° Left-Back","270° Left Side","292.5° Left-Front","315° Front-Left","337.5° Front-Left"];
+const img=document.getElementById('jersey'),viewer=document.getElementById('viewer'),wrap=document.getElementById('imageWrap'),info=document.getElementById('info'),slider=document.getElementById('angleSlider'),spinBtn=document.getElementById('spin');
+let index=0,zoom=1,spinning=false,timer=null,dragging=false,startX=0,lastX=0,dragMoved=0,pinchStart=0,pinchZoom=1;
+const preload=images.map(src=>{const i=new Image();i.src=src;return i});
+function show(i){index=(i+images.length)%images.length;img.src=images[index];img.alt='ROCK ESPORTS jersey: '+labels[index];info.textContent=`Angle ${index+1} of ${images.length} • ${labels[index]}`;slider.value=index;wrap.style.transform=`scale(${zoom})`}
+function stop(){spinning=false;spinBtn.textContent='▶ Auto rotate';spinBtn.classList.add('primary');if(timer)clearInterval(timer);timer=null}
+function step(n){show(index+n)}
+document.getElementById('prev').onclick=()=>{stop();step(-1)};
+document.getElementById('next').onclick=()=>{stop();step(1)};
+spinBtn.onclick=()=>{if(spinning){stop()}else{spinning=true;spinBtn.textContent='Ⅱ Pause rotation';spinBtn.classList.remove('primary');timer=setInterval(()=>step(1),180)}};
+document.getElementById('zoomIn').onclick=()=>{zoom=Math.min(2.5,zoom+.15);show(index)};
+document.getElementById('zoomOut').onclick=()=>{zoom=Math.max(.65,zoom-.15);show(index)};
+document.getElementById('reset').onclick=()=>{stop();zoom=1;show(0)};
+slider.addEventListener('input',()=>{stop();show(Number(slider.value))});
+viewer.addEventListener('pointerdown',e=>{dragging=true;startX=e.clientX;lastX=e.clientX;dragMoved=0;viewer.setPointerCapture(e.pointerId);stop()});
+viewer.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lastX;dragMoved+=Math.abs(dx);if(Math.abs(e.clientX-startX)>7){const frames=Math.trunc((e.clientX-startX)/24);show(index);const target=((Math.round((startX-e.clientX)/24))%images.length);if(target!==0){index=(index-target+images.length)%images.length;img.src=images[index];info.textContent=`Angle ${index+1} of ${images.length} • ${labels[index]}`;slider.value=index;startX=e.clientX}}lastX=e.clientX});
+viewer.addEventListener('pointerup',()=>dragging=false);viewer.addEventListener('pointercancel',()=>dragging=false);
+viewer.addEventListener('touchstart',e=>{if(e.touches.length===2){pinchStart=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);pinchZoom=zoom}},{passive:true});
+viewer.addEventListener('touchmove',e=>{if(e.touches.length===2&&pinchStart){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);zoom=Math.max(.65,Math.min(2.5,pinchZoom*d/pinchStart));wrap.style.transform=`scale(${zoom})`}},{passive:true});
+viewer.addEventListener('touchend',()=>pinchStart=0);
+show(0);
+</script></body></html>
